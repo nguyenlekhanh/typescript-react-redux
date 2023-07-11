@@ -22,6 +22,10 @@ interface ProductsSliceState {
 
 export const addProductAsync = createAsyncThunk('products/addNewProduct', async(initialProduct: Product) => {
     const product = await validateProduct(initialProduct);
+    //or we can create a request to server using axio like below
+    //const POSTS_URL = 'https://jsonplaceholder.typicode.com/posts';
+    //const response = await axios.get(POSTS_URL)
+    //return response.data
     return product;
 });
 
