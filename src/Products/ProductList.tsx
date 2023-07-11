@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { getProductsSelector } from "./products.slice";
 
 interface ProductsListProps {}
 
@@ -15,27 +17,17 @@ const initialProducts = [
 ];
 
 const ProductList: React.FC<ProductsListProps> = ({}) => {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  //const [products, setProducts] = useState<Product[]>(initialProducts);
+  const products = useSelector(getProductsSelector);
 
   return (
     <div>
       <label>ProductList</label>
-      {products.map((product) => (
+      {products.map((product: Product) => (
         <div key={product.id}>
           <span>{`${product.title} : ${product.price}`}</span>
         </div>
       ))}
-
-      <button
-        onClick={() =>
-          setProducts((prevProducts) => [
-            { title: "test", price: 100, id: "test" },
-            ...prevProducts,
-          ])
-        }
-      >
-        Add Product
-      </button>
     </div>
   );
 };
