@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction, createEntityAdapter } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import validateProduct from "../fake.api";
 
@@ -15,10 +15,22 @@ export enum ValidationState {
 }
 
 interface ProductsSliceState {
-    products: Product[],
+    //entities: Product[],
     validationState?: ValidationState,
     errorMessage?: string
 }
+
+// const initialState: ProductsSliceState = {
+//     products: initialProducts,
+//     validationState: undefined,
+//     errorMessage: undefined
+// }
+
+const productAdapter = createEntityAdapter<Product>();
+const initialState = productAdapter.getInitialState<ProductsSliceState>({
+    errorMessage: undefined,
+    validationState: undefined
+});
 
 export const addProductAsync = createAsyncThunk('products/addNewProduct', async(initialProduct: Product) => {
     const product = await validateProduct(initialProduct);
@@ -35,32 +47,27 @@ const initialProducts: Product[] = [
   { title: "Hell", price: 50, id: "Hel" },
 ];
 
-const initialState: ProductsSliceState = {
-    products: initialProducts,
-    validationState: undefined,
-    errorMessage: undefined
-}
+const filledInitialState = productAdapter.upsertMany(initialState, initialProducts);
 
 const productsSlice = createSlice({
   name: "products", //for devtool
-  initialState: initialState,
+  initialState: filledInitialState,
   reducers: {
     addProduct: (state, action: PayloadAction<Product>) => {
       //return [action.payload, ...state];
-      state.products.push(action.payload); //using immer;
+      //state.products.push(action.payload); //using immer;
+      productAdapter.upsertOne(state, action.payload);
     },
-    removeProduct: (state, action: PayloadAction<string>) => ({
-        ...state,
-        products: state.products.filter((product) => product.id !== action.payload)
-    }),
+    removeProduct: (state, action: PayloadAction<string>) => {
+        productAdapter.removeOne(state, action.payload);
+    },
   },
   extraReducers: builder => {
-    builder.addCase(addProductAsync.fulfilled, (state, action) => ({
-        ...state,
-        validationState: ValidationState.Fulfilled,
-        errorMessage: undefined,
-        products: [...state.products, action.payload]
-    }))
+    builder.addCase(addProductAsync.fulfilled, (state, action) => {
+        productAdapter.upsertOne(state, action.payload);
+        state.validationState = ValidationState.Fulfilled;
+        state.errorMessage = undefined
+    })
     builder.addCase(addProductAsync.rejected, (state, action) => ({
         ...state,
         validationState: ValidationState.Rejected,
@@ -76,7 +83,15 @@ const productsSlice = createSlice({
 
 export const { addProduct, removeProduct } = productsSlice.actions;
 
-export const getProductsSelector = (state: RootState) => state.products.products;
+export const getProductsSelector = (state: RootState) => state.products.entities;
 export const getErrorMessage = (state: RootState) => state.products.errorMessage;
+
+export const {
+  selectAll: selectAllProducts,
+  selectById: selectProductById,
+  selectEntities: selectProductEntities,
+  selectIds: selectProductIds,
+  selectTotal: selecTotalProducts
+} = productAdapter.getSelectors<RootState>(state => state.products);
 
 export default productsSlice.reducer;

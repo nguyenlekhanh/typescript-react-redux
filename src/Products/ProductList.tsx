@@ -1,8 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { getProductsSelector, removeProduct } from "./products.slice";
+import { getProductsSelector, removeProduct, selectAllProducts, selectProductById, selectProductEntities } from "./products.slice";
 import { useAppDispatch } from "../store.hooks";
 import { addToCart } from "../Cart/cart.slice";
+import { Root } from "react-dom/client";
+import { RootState } from "../store";
 
 interface ProductsListProps {}
 
@@ -20,7 +22,12 @@ const initialProducts = [
 
 const ProductList: React.FC = () => {
   //const [products, setProducts] = useState<Product[]>(initialProducts);
-  const products = useSelector(getProductsSelector);
+  const products = useSelector(selectAllProducts);
+  const Mro = useSelector<RootState>(state => selectProductById(state, 'Mro'));
+  console.log(Mro);
+  const entities = useSelector(selectProductEntities);
+  console.log(entities['Mro']);
+
   const dispatch = useAppDispatch();
 
   const removeFromStore = (id: string) => {
