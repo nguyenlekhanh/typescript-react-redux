@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { Product, addProduct } from "./products.slice";
+import { Product, addProduct, addProductAsync, getErrorMessage } from "./products.slice";
 import { useAppDispatch } from "../store.hooks";
+import { useSelector } from "react-redux";
 
 const ProductForm = () => {
     const dispatch = useAppDispatch();
+    const errorMessage = useSelector(getErrorMessage);
+
   const [product, setProduct] = useState<Product>({
     id: "",
     title: "",
@@ -23,7 +26,7 @@ const ProductForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(addProduct(product));
+    dispatch(addProductAsync(product));
     setProduct({
         id: "",
         title: "",
@@ -34,8 +37,10 @@ const ProductForm = () => {
   return (
     <>
       <h2>Add Game To Cart</h2>
+      {errorMessage && <span>error: {errorMessage}</span>}
       <form onSubmit={handleSubmit}>
         <input
+          style={{border: errorMessage? '1px solid red': '1px solid black'}}
           type="text"
           placeholder="Game title"
           name="title"
@@ -43,6 +48,7 @@ const ProductForm = () => {
           onChange={handleChange}
         />
         <input
+          style={{border: errorMessage? '1px solid red': '1px solid black'}}
           type="number"
           placeholder="Price"
           name="price"
@@ -50,13 +56,16 @@ const ProductForm = () => {
           onChange={handleChange}
         />
         <input
+          style={{border: errorMessage? '1px solid red': '1px solid black'}}
           type="text"
           placeholder="id"
           name="id"
           value={id}
           onChange={handleChange}
         />
-        <button type="submit">Add Product</button>
+        <button 
+          style={{backgroundColor: errorMessage? 'red': '#f2f5f9'}}
+          type="submit">Add Product</button>
       </form>
     </>
   );
