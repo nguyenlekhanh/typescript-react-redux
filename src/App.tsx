@@ -3,6 +3,7 @@ import './App.css';
 import ProductForm from './Products/ProductForm';
 import ProductList from './Products/ProductList';
 import store from './store';
+import Cart from './Cart/Cart';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <div className="App">
         <ProductList />
         <ProductForm />
+        <Cart />
       </div>
     </Provider>
   );
