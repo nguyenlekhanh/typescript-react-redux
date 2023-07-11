@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { create } from 'domain';
 import { RootState } from '../store';
 
-interface Product {
+export interface Product {
     title: string;
     price: number;
     id: string;
@@ -19,7 +19,8 @@ const productsSlice = createSlice({
     initialState: initialProducts,
     reducers: {
         addProduct: (state, action: PayloadAction<Product>) => {
-            return [action.payload, ...state];
+            //return [action.payload, ...state];
+            state.push(action.payload); //using immer;
         }
     }
 });
